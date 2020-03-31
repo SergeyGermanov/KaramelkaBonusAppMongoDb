@@ -4,8 +4,9 @@ Year: 2020
 
 Front End:
 Back End: Node.JS
-Vanila JavaScript
 Database: MongoDb
+Vanila JavaScript
+
 
 This is a Node.JS App that helps to deposit and withdraw BONUS points in Hairsaloon Client's Base.
 
