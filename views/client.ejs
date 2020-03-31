@@ -1,0 +1,143 @@
+<%- include('partials/header')%>
+
+<script>
+     $(document).ready(function() {
+        $(".select").dropdown();
+        $('.message .close').on('click', function(){
+     $(this).closest('.message').transition('fade');
+         });
+   });
+</script>
+
+<div class="ui container">
+  <div class="ui warning form segment">
+    <a href="/" class="ui orange ribbon label">Ввести новый номер</a>
+    <div class="ui warning huge message">
+      <div class="header"><%= data.name%></div>
+      <p class="ui sub header"><%= phNumber%></p>
+      <div class="ui orange mini tag label">Потрачено <%= data.money%> <i class="ruble sign icon"></i></div>
+    </div>
+    <div style="text-align: center">
+      <div id="bonusLabel" class="ui massive orange basic label"><%= data.bonus%> Бонусов</div>
+    </div>
+    <form action="/client" method="POST">
+      <div class="two fields">
+        <div class="field">
+          <label>Процент списания</label>
+          <select name="percent" class="ui search dropdown select">
+            <%if(data.percent === 10){%>
+              <option value="10">10 %</option>
+              <option value="25">25 %</option>
+              <option value="50">50 %</option>
+              <option value="75">75 %</option>
+              <option value="100">100 %</option>
+            <%} else if(data.percent === 25){%>
+              <option value="25">25 %</option>
+              <option value="10">10 %</option>              
+              <option value="50">50 %</option>
+              <option value="75">75 %</option>
+              <option value="100">100 %</option>
+              <%} else if(data.percent === 50){%>
+                <option value="50">50 %</option>
+                <option value="10">10 %</option>
+                <option value="25">25 %</option>                
+                <option value="75">75 %</option>
+                <option value="100">100 %</option>
+                <%} else if(data.percent === 75){%>
+                  <option value="75">75 %</option>
+                  <option value="10">10 %</option>
+                  <option value="25">25 %</option>
+                  <option value="50">50 %</option>                  
+                  <option value="100">100 %</option>
+              <%} else {%>
+              <option value="100">100 %</option>
+              <option value="10">10 %</option>
+              <option value="25">25 %</option>
+              <option value="50">50 %</option>
+              <option value="75">75 %</option>
+            <%}%>
+          </select>
+        
+        </div>
+        <div class="field">
+            <label>Бонус равен</label>
+                <select name="bonusIndex" class="ui search dropdown select">
+                    <%if(data.bonusIndex === 10){%>
+                      <option value="10">1 Бонус = 10 рублям</option>
+                      <option value="15">1 Бонус = 15 рублям</option>
+                      <option value="20">1 Бонус = 20 рублям</option>
+                    <%} else if(data.bonusIndex === 15){%>
+                      <option value="15">1 Бонус = 15 рублям</option>
+                      <option value="10">1 Бонус = 10 рублям</option>                      
+                      <option value="20">1 Бонус = 20 рублям</option>
+                      <%} else {%>
+                        <option value="20">1 Бонус = 20 рублям</option>
+                        <option value="10">1 Бонус = 10 рублям</option>                      
+                        <option value="15">1 Бонус = 15 рублям</option>
+                    <%}%>
+                  </select>
+          </div> 
+        </div>
+        
+    
+        <div class="field">
+          <input class="ui center aligned segment"
+            id="bonuses"
+            name="bonus"
+            type="number"
+            placeholder="введите сумму к оплате в рублях"
+            autocomplete="off"
+            maxlength="7"
+            size="10"
+            required
+          />
+          <%if(typeof message != 'undefined' && JSON.stringify(message) !== '{}' && message.action == 'withdraw') {%>
+          <div class="ui warning message">
+            <i class="close icon"></i>
+            <!-- <div class="header">
+              Обшая сумма к оплате: <%= message.fullPay%><i class="ruble sign icon"></i>
+            </div>
+            <ul class="list">
+              <li><strong><%= message.bonus%> Бонусов</strong> списано</li>
+              <li><strong><%= message.pay%><i class="ruble sign icon"></i></strong> к оплате</li>
+            </ul> -->
+            <div class="header">
+              <%= message.bonus%> Бонусов списано
+            </div>
+            <ul class="list">
+              <!-- <li>Обшая сумма <strong><%= message.fullPay%><i class="ruble sign icon"></i></strong></li> -->
+              <li><strong><%= message.pay%><i class="ruble sign icon"></i></strong> к оплате</li>
+            </ul>
+          </div>
+          <%} else if(typeof message != 'undefined' && JSON.stringify(message) !== '{}' && message.action == 'deposit') {%>
+          <div class="ui info message">
+            <i class="close icon"></i>
+            <!-- <div class="header">
+              Обшая сумма оплаты: <%= message.fullPay%><i class="ruble sign icon"></i>
+            </div>
+            <ul class="list">
+              <li><strong><%= message.bonus%> Бонусов</strong> добавлено</li>
+            </ul> -->
+            <div class="header">
+              <%= message.bonus%> Бонусов добавлено
+            </div>
+            <!-- <ul class="list">
+              <li>Обшая сумма оплаты <strong></strong><%= message.fullPay%><i class="ruble sign icon"></i></strong></li>
+            </ul> -->
+          </div>
+          <%}%>
+          </div>
+          <div class="ui two buttons">
+            <%if(data.bonus == 0) {%>
+            <button type="submit" id="withdraw" name="action" value="withdraw" class="ui basic disabled red button">Списать</button>
+            <%} else {%>
+              <button type="submit" id="withdraw" name="action" value="withdraw" class="ui basic red button">Списать</button>
+              <%}%>
+            <button type="submit" id="deposit" name="action" value="deposit" class="ui basic green button">Начислить</button>
+          </div>
+        </form>
+      </div>
+  </div>
+</div>
+
+<%- include('partials/footer')%>

@@ -1,0 +1,88 @@
+<%- include('partials/header')%>
+
+
+
+<script>
+    $(document).ready(function() {
+       $("#select").dropdown();
+     });
+ 
+</script>
+
+<div class="ui container">
+ <div class="ui warning form segment">
+   <a href="/" class="ui orange ribbon label"><i class="home icon"></i></a>
+   <div class="ui warning huge message">
+     <div class="header">Новый клиент!</div>
+   </div>
+   <form action="/create" method="POST">
+    <div class="field">
+        <label>Имя клиента</label>
+        <input
+      type="text"
+      name="name"
+      placeholder="Иван Иванов"
+      required
+      autocomplete="off"
+    />
+      </div>
+      <div class="field">
+        <label for="telNo">Введите номер телефона клиента</label>
+        <input
+         class="ui center aligned segment"
+          id="telNo"
+          name="telNo"
+          type="tel"
+          size="13"
+          minlength="10"
+          maxlength="10"
+          required
+          autocomplete="off"
+          placeholder="+7(___) ___-____"
+        />
+      </div>
+     <div class="two fields">
+       <div class="field">
+         <label>Процент списания</label>
+         <select name="percent" class="ui search dropdown" id="select">
+            <option value="10">10 %</option>
+            <option value="25">25 %</option>
+            <option value="50">50 %</option>
+            <option value="75">75 %</option>
+            <option value="100">100 %</option>
+        </select>
+       
+       </div>
+       <div class="field">
+           <label>Бонус равен</label>
+               <select name="bonusIndex" class="ui search dropdown" id="select">
+                    <option value="10">1 Бонус = 10 рублям</option>
+                    <option value="15">1 Бонус = 15 рублям</option>
+                    <option value="20">1 Бонус = 20 рублям</option>
+                 </select>
+         </div> 
+       </div>
+         <div class="field">
+          <input class="ui center aligned segment"
+          id="bonus"
+          name="bonus"
+          type="number"
+          placeholder="Потраченная сумма"
+          autocomplete="off"
+          maxlength="7"
+          size="10"
+          required
+        />
+        </div>
+         <div class="ui two buttons">
+           <button type="submit" class="ui basic blue button"><i class="user plus icon"></i>Создать</button>
+           <button type="reset" class="ui basic grey button"><i class="redo icon"></i>Сбросить</button>
+         </div>
+       </form>
+     </div>
+ </div>
+</div>
+
+
+
+<%- include('partials/footer')%>

@@ -1,0 +1,44 @@
+<%- include('partials/header')%>
+
+<div class="ui container">
+  <div class="ui cards">
+    <div class="ui centered card">
+      <div class="content">
+        <h2 class="ui center aligned icon header">
+          <i class="users icon"></i>
+          Карамель.Ка
+        </h2>
+        <div class="ui center aligned orange segment">
+          Введите номер телефона клиента
+        </div>
+        <form class="ui massive fluid form" action="/" method="POST">      
+            <div class="field">
+              <input class="ui center aligned segment"
+              id="telNo"
+              name="telNo"
+              type="tel"
+              size="13"
+              minlength="10"
+              maxlength="10"
+              required
+              autocomplete="off"
+              placeholder="+7(___) ___-____"
+            />
+            </div>
+          </div>
+            <button type="submit" class="ui bottom attached button">
+              <i class="search icon"></i>
+              Найти Клиента
+            </button>
+            <a class="ui bottom attached button" href="/create">
+              <i class="user plus icon"></i>
+              Новый Клиент
+            </a>
+        </form>
+      </div>       
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer')%>
