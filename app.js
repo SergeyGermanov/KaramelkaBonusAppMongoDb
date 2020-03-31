@@ -4,13 +4,13 @@ const bodyParser = require("body-parser"),
   dataBaseM = require("./models/clientBase"),
   seedDb = require("./seeds"),
   querystring = require("querystring"),
+  dotenv = require("dotenv"),
   app = express();
 
-const db =
-  "mongodb+srv://sergyleo:Scarab_82@cluster0-bbl44.mongodb.net/test?retryWrites=true&w=majority";
+dotenv.config();
 
 mongoose
-  .connect(db, {
+  .connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
   })
