@@ -41,6 +41,14 @@
           placeholder="+7(___) ___-____"
         />
       </div>
+      <%if(typeof message != 'undefined' && JSON.stringify(message) !== '{}' && message.action == 'error') {%>
+        <div class="ui warning message">
+          <i class="close icon"></i>
+          <div class="header">
+            Клиент с номером +<%= message.phone%> уже существует. Введите другой номер.
+          </div>
+        </div>
+        <%}%>
      <div class="two fields">
        <div class="field">
          <label>Процент списания</label>

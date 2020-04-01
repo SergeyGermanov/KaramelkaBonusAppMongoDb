@@ -128,7 +128,7 @@ app.post("/client", function(req, res) {
 });
 
 app.get("/create", function(req, res) {
-  res.render("create");
+  res.render("create", { message: message });
 });
 
 app.post("/create", function(req, res) {
@@ -146,11 +146,20 @@ app.post("/create", function(req, res) {
     Number(req.body.bonus) / Number(req.body.bonusIndex)
   );
 
-  if (dataBaseM.exists({ phone: idPhone })) {
-    console.log(
-      `Клиент с номером +${idPhone} уже существует. Введите другой номер.`
-    );
+  //fix  Promise {pending} do not return true or false
+  var clientExists = dataBaseM.exists({ phone: idPhone });
+
+  console.log(clientExists);
+
+  if (clientExists) {
+    message = {
+      phone: idPhone,
+      action: "error"
+    };
+    console.log(message.phone);
+    res.redirect("/create");
   } else {
+    message = {};
     dataBaseM.create(clientCreated, function(err, client) {
       if (err) {
         console.log(err);
@@ -162,7 +171,7 @@ app.post("/create", function(req, res) {
     });
   }
 });
-
+//fix  Promise {pending} do not return true or false
 app.listen(app.get("port"), function() {
   console.log("Express started on http://localhost:" + app.get("port"));
 });
