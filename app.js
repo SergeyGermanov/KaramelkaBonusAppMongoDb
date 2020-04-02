@@ -24,23 +24,6 @@ app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: true }));
 // seedDb();
 
-// var dataBase = {
-//   79059847682: {
-//     name: "Сергей Германов",
-//     bonus: 1000,
-//     money: 1000,
-//     bonusIndex: 25,
-//     percent: 10
-//   },
-//   79039109829: {
-//     name: "Алексей Германов",
-//     bonus: 3000,
-//     money: 1000,
-//     bonusIndex: 10,
-//     percent: 25
-//   }
-// };
-
 var phNumber;
 var idPhone;
 var data;
@@ -163,7 +146,6 @@ app.post("/create", function(req, res) {
       res.redirect("/create");
     } else {
       // if does not add it
-      // message = {};
       message = {
         phone: idPhone,
         action: "added"
@@ -177,6 +159,17 @@ app.post("/create", function(req, res) {
           res.redirect("/create");
         }
       });
+    }
+  });
+});
+
+app.get("/list", function(req, res) {
+  dataBaseM.find({}, function(err, list) {
+    if (err) {
+      console.log(err);
+      res.redirect("/");
+    } else {
+      res.render("list", { list: list });
     }
   });
 });

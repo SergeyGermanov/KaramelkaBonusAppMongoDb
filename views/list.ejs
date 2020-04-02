@@ -1,0 +1,45 @@
+<%- include('partials/header')%>
+
+<script>
+  $(document).ready(function() {
+    $(".ui.accordion").accordion();
+  });
+</script>
+
+<div class="ui container">
+  <div class="ui warning form segment">
+    <a href="/" class="ui orange ribbon label"><i class="home icon"></i></a>
+    <div class="ui warning huge message">
+      <div class="header">Список клиентов!</div>
+    </div>
+
+    <div class="ui styled fluid accordion">
+      <%list.forEach((list) => {%>
+      <div class="title">
+        <i class="dropdown icon"></i>
+        <%= list.name%>
+      </div>
+      <div class="content">
+        <p class="transition hidden">
+          <strong>Номер телефона:</strong> +<%= list.phone%>
+        </p>
+        <p class="transition hidden">
+          <strong>Количество бонусов:</strong> <%= list.bonus%> баллов
+        </p>
+        <p class="transition hidden">
+          <strong>Бонус равен:</strong> 1 Бонус = <%= list.bonusIndex%> рублям
+        </p>
+        <p class="transition hidden">
+          <strong>Процент списания:</strong> <%= list.percent%>%
+        </p>
+
+        <p class="transition hidden">
+          <strong>Потрачено в салоне:</strong> <%= list.money%> рублей
+        </p>
+      </div>
+      <%})%>
+    </div>
+  </div>
+
+  <%- include('partials/footer')%>
+</div>
