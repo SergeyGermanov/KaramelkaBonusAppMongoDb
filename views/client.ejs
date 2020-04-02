@@ -94,53 +94,27 @@
           <%if(typeof message != 'undefined' && JSON.stringify(message) !== '{}' && message.action == 'withdraw') {%>
           <div class="ui warning message">
             <i class="close icon"></i>
-            <!-- <div class="header">
-              Обшая сумма к оплате: <%= message.fullPay%><i class="ruble sign icon"></i>
-            </div>
-            <ul class="list">
-              <li><strong><%= message.bonus%> Бонусов</strong> списано</li>
-              <li><strong><%= message.pay%><i class="ruble sign icon"></i></strong> к оплате</li>
-            </ul> -->
             <div class="header">
               <%= message.bonus%> Бонусов списано
             </div>
             <ul class="list">
-              <!-- <li>Обшая сумма <strong><%= message.fullPay%><i class="ruble sign icon"></i></strong></li> -->
               <li><strong><%= message.pay%><i class="ruble sign icon"></i></strong> к оплате</li>
             </ul>
           </div>
           <%} else if(typeof message != 'undefined' && JSON.stringify(message) !== '{}' && message.action == 'deposit') {%>
           <div class="ui info message">
             <i class="close icon"></i>
-            <!-- <div class="header">
-              Обшая сумма оплаты: <%= message.fullPay%><i class="ruble sign icon"></i>
-            </div>
-            <ul class="list">
-              <li><strong><%= message.bonus%> Бонусов</strong> добавлено</li>
-            </ul> -->
             <div class="header">
               <%= message.bonus%> Бонусов добавлено
             </div>
-            <!-- <ul class="list">
-              <li>Обшая сумма оплаты <strong></strong><%= message.fullPay%><i class="ruble sign icon"></i></strong></li>
-            </ul> -->
           </div>
           <%} else if(typeof message != 'undefined' && JSON.stringify(message) !== '{}' && message.action == 'error') {%>
             <div class="ui warning message">
               <i class="close icon"></i>
-              <!-- <div class="header">
-                Обшая сумма оплаты: <%= message.fullPay%><i class="ruble sign icon"></i>
-              </div>
-              <ul class="list">
-                <li><strong><%= message.bonus%> Бонусов</strong> добавлено</li>
-              </ul> -->
               <div class="header">
                 Произошла ошибка при записи:
                 <%=message.error%>
               </div>
-              <!-- <ul class="list">
-                <li>Обшая сумма оплаты <strong></strong><%= message.fullPay%><i class="ruble sign icon"></i></strong></li>
-              </ul> -->
             </div>
             <%}%>
           </div>

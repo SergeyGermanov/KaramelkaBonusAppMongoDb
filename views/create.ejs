@@ -5,6 +5,9 @@
 <script>
     $(document).ready(function() {
        $("#select").dropdown();
+       $('.message .close').on('click', function(){
+  $(this).closest('.message').transition('fade');
+      });
      });
  
 </script>
@@ -48,7 +51,14 @@
             Клиент с номером +<%= message.phone%> уже существует. Введите другой номер.
           </div>
         </div>
-        <%}%>
+        <%} else if(typeof message != 'undefined' && JSON.stringify(message) !== '{}' && message.action == 'added') {%>
+          <div class="ui info message">
+            <i class="close icon"></i>
+            <div class="header">
+              Клиент с номером +<%= message.phone%> успешно добавлен в базу данных.
+            </div>
+          </div>
+          <%}%>
      <div class="two fields">
        <div class="field">
          <label>Процент списания</label>

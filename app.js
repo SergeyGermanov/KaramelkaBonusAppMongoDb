@@ -129,6 +129,7 @@ app.post("/client", function(req, res) {
 
 app.get("/create", function(req, res) {
   res.render("create", { message: message });
+  message = {};
 });
 
 app.post("/create", function(req, res) {
@@ -146,32 +147,40 @@ app.post("/create", function(req, res) {
     Number(req.body.bonus) / Number(req.body.bonusIndex)
   );
 
-  //fix  Promise {pending} do not return true or false
-  var clientExists = dataBaseM.exists({ phone: idPhone });
-
-  console.log(clientExists);
-
-  if (clientExists) {
-    message = {
-      phone: idPhone,
-      action: "error"
-    };
-    console.log(message.phone);
-    res.redirect("/create");
-  } else {
-    message = {};
-    dataBaseM.create(clientCreated, function(err, client) {
-      if (err) {
-        console.log(err);
-        res.redirect("/create");
-      } else {
-        console.log("added a client");
-        res.redirect("/create");
-      }
+  //check if this phone number exists
+  var clientExists = data =>
+    dataBaseM.findOne(data).then(token => {
+      return token;
     });
-  }
+
+  clientExists({ phone: idPhone }).then(function(result) {
+    // if exists show an alert message
+    if (result) {
+      message = {
+        phone: idPhone,
+        action: "error"
+      };
+      res.redirect("/create");
+    } else {
+      // if does not add it
+      // message = {};
+      message = {
+        phone: idPhone,
+        action: "added"
+      };
+      dataBaseM.create(clientCreated, function(err, client) {
+        if (err) {
+          console.log(err);
+          res.redirect("/create");
+        } else {
+          console.log("added a client");
+          res.redirect("/create");
+        }
+      });
+    }
+  });
 });
-//fix  Promise {pending} do not return true or false
+
 app.listen(app.get("port"), function() {
   console.log("Express started on http://localhost:" + app.get("port"));
 });
