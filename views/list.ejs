@@ -1,7 +1,14 @@
 <%- include('partials/header')%>
 
 <script>
-  $(document).ready(function() {
+  $(document).ready(function () {
+    $(".autumn").on("click", function () {
+      $(this)
+        .closest(".content")
+        .parent()
+        .find(".relaxed")
+        .transition("fade up");
+    });
     $(".ui.accordion").accordion();
   });
 </script>
@@ -15,6 +22,7 @@
 
     <div class="ui styled fluid accordion">
       <%list.forEach((list) => {%>
+
       <div class="title">
         <i class="dropdown icon"></i>
         <%= list.name%>
@@ -36,7 +44,36 @@
         <p class="transition hidden">
           <strong>Потрачено в салоне:</strong> <%= list.money%> рублей
         </p>
+        <button class="autumn">pop up</button>
+
+        <div class="ui relaxed divided list">
+          <div class="item">
+            <i class="large github middle aligned icon"></i>
+            <div class="content">
+              <a class="header"><%= list.transactions[0].date%></a>
+              <div class="description">
+                Бонусы: <%= list.transactions[0].bonus%>
+              </div>
+              <div class="description">
+                Потрачено денег: <%= list.transactions[0].money%>
+              </div>
+            </div>
+          </div>
+          <div class="item">
+            <i class="large github middle aligned icon"></i>
+            <div class="content">
+              <a class="header"><%= list.transactions[0].date%></a>
+              <div class="description">
+                Бонусы: <%= list.transactions[0].bonus%>
+              </div>
+              <div class="description">
+                Потрачено денег: <%= list.transactions[0].money%>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
+
       <%})%>
     </div>
   </div>

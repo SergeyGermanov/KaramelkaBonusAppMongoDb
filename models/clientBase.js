@@ -6,7 +6,13 @@ var clientBaseSchema = new mongoose.Schema({
   bonus: Number,
   money: Number,
   bonusIndex: Number,
-  percent: Number
+  percent: Number,
+  transactions: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Transactions",
+    },
+  ],
 });
 
 module.exports = mongoose.model("dataBaseM", clientBaseSchema);

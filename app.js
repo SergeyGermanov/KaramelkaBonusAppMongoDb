@@ -2,7 +2,9 @@ const bodyParser = require("body-parser"),
   express = require("express"),
   mongoose = require("mongoose"),
   dataBaseM = require("./models/clientBase"),
+  Transactions = require("./models/transactions"),
   seedDb = require("./seeds"),
+  date = require("./date"),
   querystring = require("querystring"),
   dotenv = require("dotenv"),
   app = express();
@@ -12,10 +14,10 @@ dotenv.config();
 mongoose
   .connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
   })
   .then(() => console.log("MongoDB connected..."))
-  .catch(err => console.log(err));
+  .catch((err) => console.log(err));
 mongoose.set("useFindAndModify", false);
 
 app.set("port", process.env.PORT || 8080);
@@ -29,15 +31,15 @@ var idPhone;
 var data;
 var message;
 
-app.get("/", function(req, res) {
+app.get("/", function (req, res) {
   res.render("index");
 });
 
-app.post("/", function(req, res) {
+app.post("/", function (req, res) {
   phNumber = req.body.telNo;
   idPhone = phNumber.replace(/[^\d.]/g, "");
 
-  dataBaseM.findOne({ phone: idPhone }, function(err, client) {
+  dataBaseM.findOne({ phone: idPhone }, function (err, client) {
     if (err) {
       console.log(err);
     } else {
@@ -47,7 +49,7 @@ app.post("/", function(req, res) {
   });
 });
 
-app.get("/client", function(req, res) {
+app.get("/client", function (req, res) {
   if (phNumber && data) {
     res.render("client", { phNumber: phNumber, data: data, message: message });
     message = {};
@@ -56,7 +58,7 @@ app.get("/client", function(req, res) {
   }
 });
 
-app.post("/client", function(req, res) {
+app.post("/client", function (req, res) {
   data.bonusIndex = Number(req.body.bonusIndex);
   data.percent = Number(req.body.percent);
 
@@ -68,9 +70,8 @@ app.post("/client", function(req, res) {
     data.bonus += Math.round(bonus);
     data.money += Number(req.body.bonus);
     message = {
-      fullPay: req.body.bonus,
       bonus: Math.round(bonus),
-      action: "deposit"
+      action: "deposit",
     };
   } else {
     if (bonusPercent < 0) {
@@ -79,7 +80,7 @@ app.post("/client", function(req, res) {
         fullPay: req.body.bonus,
         bonus: data.bonus,
         pay: req.body.bonus - data.bonus,
-        action: "withdraw"
+        action: "withdraw",
       };
       data.bonus = 0;
     } else {
@@ -89,16 +90,16 @@ app.post("/client", function(req, res) {
         fullPay: req.body.bonus,
         bonus: Math.round(percent),
         pay: Number(req.body.bonus) - Math.round(percent),
-        action: "withdraw"
+        action: "withdraw",
       };
     }
   }
 
-  dataBaseM.findOneAndUpdate({ phone: idPhone }, data, function(err, update) {
+  dataBaseM.findOneAndUpdate({ phone: idPhone }, data, function (err, update) {
     if (err) {
       message = {
         error: err,
-        action: "error"
+        action: "error",
       };
       console.log(`Clent ${data.name} NOT updated`);
       res.redirect("/client");
@@ -110,12 +111,12 @@ app.post("/client", function(req, res) {
   });
 });
 
-app.get("/create", function(req, res) {
+app.get("/create", function (req, res) {
   res.render("create", { message: message });
   message = {};
 });
 
-app.post("/create", function(req, res) {
+app.post("/create", function (req, res) {
   var clientCreated = {};
   idPhone = req.body.telNo.replace(/[^\d.]/g, "");
 
@@ -131,26 +132,26 @@ app.post("/create", function(req, res) {
   );
 
   //check if this phone number exists
-  var clientExists = data =>
-    dataBaseM.findOne(data).then(token => {
+  var clientExists = (data) =>
+    dataBaseM.findOne(data).then((token) => {
       return token;
     });
 
-  clientExists({ phone: idPhone }).then(function(result) {
+  clientExists({ phone: idPhone }).then(function (result) {
     // if exists show an alert message
     if (result) {
       message = {
         phone: idPhone,
-        action: "error"
+        action: "error",
       };
       res.redirect("/create");
     } else {
       // if does not add it
       message = {
         phone: idPhone,
-        action: "added"
+        action: "added",
       };
-      dataBaseM.create(clientCreated, function(err, client) {
+      dataBaseM.create(clientCreated, function (err, client) {
         if (err) {
           console.log(err);
           res.redirect("/create");
@@ -163,17 +164,16 @@ app.post("/create", function(req, res) {
   });
 });
 
-app.get("/list", function(req, res) {
-  dataBaseM.find({}, function(err, list) {
-    if (err) {
-      console.log(err);
-      res.redirect("/");
-    } else {
-      res.render("list", { list: list });
-    }
-  });
+app.get("/list", function (req, res) {
+  dataBaseM
+    .find({})
+    //add transactions to the main database
+    .populate("transactions")
+    .exec((err, list) => {
+      err ? console.log(err) : res.render("list", { list: list });
+    });
 });
 
-app.listen(app.get("port"), function() {
+app.listen(app.get("port"), function () {
   console.log("Express started on http://localhost:" + app.get("port"));
 });
