@@ -65,17 +65,22 @@ app.post("/client", function (req, res) {
   var bonus = Number(req.body.bonus) / data.bonusIndex;
   var percent = (Number(req.body.bonus) * Number(req.body.percent)) / 100;
   var bonusPercent = data.bonus - Math.round(percent);
+  var sign = "+";
+  var bonusTrans;
 
   if (req.body.action === "deposit") {
     data.bonus += Math.round(bonus);
     data.money += Number(req.body.bonus);
+    bonusTrans = Math.round(bonus);
     message = {
       bonus: Math.round(bonus),
       action: "deposit",
     };
   } else {
     if (bonusPercent < 0) {
+      sign = "-";
       data.money += Math.abs(bonusPercent);
+      bonusTrans = data.bonus;
       message = {
         fullPay: req.body.bonus,
         bonus: data.bonus,
@@ -84,8 +89,10 @@ app.post("/client", function (req, res) {
       };
       data.bonus = 0;
     } else {
+      sign = "-";
       data.bonus -= Math.round(percent);
       data.money += Number(req.body.bonus) - Math.round(percent);
+      bonusTrans = Math.round(percent);
       message = {
         fullPay: req.body.bonus,
         bonus: Math.round(percent),
@@ -104,6 +111,22 @@ app.post("/client", function (req, res) {
       console.log(`Clent ${data.name} NOT updated`);
       res.redirect("/client");
     } else {
+      Transactions.create(
+        {
+          date: date(),
+          money: `+${data.money}`,
+          bonus: `${sign}${bonusTrans}`,
+        },
+        function (err, transaction) {
+          if (err) {
+            console.log(err);
+          } else {
+            update.transactions.push(transaction);
+            update.save();
+            console.log("Created new transaction");
+          }
+        }
+      );
       //redirect somewhere(show page)
       console.log(`Clent ${data.name} updated`);
       res.redirect("/client");
@@ -156,6 +179,22 @@ app.post("/create", function (req, res) {
           console.log(err);
           res.redirect("/create");
         } else {
+          Transactions.create(
+            {
+              date: date(),
+              money: `+${clientCreated.money}`,
+              bonus: `+${clientCreated.bonus}`,
+            },
+            function (err, transaction) {
+              if (err) {
+                console.log(err);
+              } else {
+                client.transactions.push(transaction);
+                client.save();
+                console.log("Created new transaction");
+              }
+            }
+          );
           console.log("added a client");
           res.redirect("/create");
         }
