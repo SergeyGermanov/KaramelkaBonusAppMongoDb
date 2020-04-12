@@ -35,22 +35,31 @@ function seedDB() {
           console.log(err);
         } else {
           console.log("added a client");
-          Transactions.create(
-            {
-              date: "8-Апреля-2020 4:51:34",
-              money: "+1000",
-              bonus: "+100",
-            },
-            function (err, transaction) {
-              if (err) {
-                console.log(err);
-              } else {
-                client.transactions.push(transaction);
-                client.save();
-                console.log("Created new transaction");
-              }
+          Transactions.deleteMany({}, function (err) {
+            if (err) {
+              console.log(err);
+            } else {
+              console.log("Transactions removed");
+              Transactions.create(
+                {
+                  date: "8-Апреля-2020 4:51:34",
+                  moneySpend: "+1000",
+                  money: "+1000",
+                  bonus: "+100",
+                  bonusTotal: "100",
+                },
+                function (err, transaction) {
+                  if (err) {
+                    console.log(err);
+                  } else {
+                    client.transactions.push(transaction);
+                    client.save();
+                    console.log("Created new transaction");
+                  }
+                }
+              );
             }
-          );
+          });
         }
       });
     });

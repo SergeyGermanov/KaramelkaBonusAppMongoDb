@@ -67,6 +67,8 @@ app.post("/client", function (req, res) {
   var bonusPercent = data.bonus - Math.round(percent);
   var sign = "+";
   var bonusTrans;
+  var moneySpend = req.body.bonus;
+  // var bonusTotal = bonusPercent;
 
   if (req.body.action === "deposit") {
     data.bonus += Math.round(bonus);
@@ -114,8 +116,10 @@ app.post("/client", function (req, res) {
       Transactions.create(
         {
           date: date(),
+          moneySpend: `+${moneySpend}`,
           money: `+${data.money}`,
           bonus: `${sign}${bonusTrans}`,
+          bonusTotal: data.bonus,
         },
         function (err, transaction) {
           if (err) {
@@ -182,8 +186,10 @@ app.post("/create", function (req, res) {
           Transactions.create(
             {
               date: date(),
+              moneySpend: `+${clientCreated.money}`,
               money: `+${clientCreated.money}`,
               bonus: `+${clientCreated.bonus}`,
+              bonusTotal: `+${clientCreated.bonus}`,
             },
             function (err, transaction) {
               if (err) {

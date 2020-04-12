@@ -50,14 +50,20 @@
             <div class="ui relaxed divided list">
               <%list.transactions.forEach((transactions) => {%>
               <div class="item">
-                <i class="large github middle aligned icon"></i>
+                <i class="credit card outline icon"></i>
                 <div class="content">
                   <a class="header"><%= transactions.date%></a>
                   <div class="description">
-                    Бонусы: <%= transactions.bonus%>
+                    Бонусы списаны/начислены: <%= transactions.bonus%>
                   </div>
                   <div class="description">
-                    Потрачено денег: <%= transactions.money%>
+                    Потрачено денег: <%= transactions.moneySpend%>
+                  </div>
+                  <div class="description">
+                    Денег в остатке: <%= transactions.money%>
+                  </div>
+                  <div class="description">
+                    Бонусы в остатке: <%= transactions.bonusTotal%>
                   </div>
                 </div>
               </div>
