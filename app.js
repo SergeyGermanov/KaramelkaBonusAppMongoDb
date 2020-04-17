@@ -24,7 +24,7 @@ app.set("port", process.env.PORT || 8080);
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: true }));
-// seedDb();
+seedDb();
 
 var phNumber;
 var idPhone;
@@ -59,50 +59,84 @@ app.get("/client", function (req, res) {
 });
 
 app.post("/client", function (req, res) {
+  // console.log(data);
   data.bonusIndex = Number(req.body.bonusIndex);
   data.percent = Number(req.body.percent);
 
-  var bonus = Number(req.body.bonus) / data.bonusIndex;
-  var percent = (Number(req.body.bonus) * Number(req.body.percent)) / 100;
-  var bonusPercent = data.bonus - Math.round(percent);
+  // var bonus = Number(req.body.bonus) / data.bonusIndex;
+  var bonus = bonusFunc(req.body.bonus, data.bonusIndex);
+  // var percent = (Number(req.body.bonus) * Number(req.body.percent)) / 100;
+  var percent = percentFunc(req.body.bonus, req.body.percent);
+  // var bonusPercent = data.bonus - Math.round(percent);
+  var bonusPercent = bonusPercentFunc(data.bonus, percent);
+
   var sign = "+";
   var bonusTrans;
   var moneySpend = req.body.bonus;
-  // var bonusTotal = bonusPercent;
 
   if (req.body.action === "deposit") {
     data.bonus += Math.round(bonus);
     data.money += Number(req.body.bonus);
     bonusTrans = Math.round(bonus);
-    message = {
-      bonus: Math.round(bonus),
-      action: "deposit",
-    };
+    // refractoring message
+
+    message = messageClient(Math.round(bonus), "deposit");
+    // console.log(message);
+    // {
+    //   bonus: Math.round(bonus),
+    //   action: "deposit",
+    // };
+
+    // refractoring message
   } else {
     if (bonusPercent < 0) {
       sign = "-";
       data.money += Math.abs(bonusPercent);
       bonusTrans = data.bonus;
-      message = {
-        fullPay: req.body.bonus,
-        bonus: data.bonus,
-        pay: req.body.bonus - data.bonus,
-        action: "withdraw",
-      };
+
+      // refractoring message
+      let pay = req.body.bonus - data.bonus;
+      message = messageClient(data.bonus, "withdraw", pay, req.body.bonus);
+      // console.log(message);
+      // {
+      //   fullPay: req.body.bonus,
+      //   bonus: data.bonus,
+      //   pay: req.body.bonus - data.bonus,
+      //   action: "withdraw",
+      // };
+      // refractoring message
       data.bonus = 0;
     } else {
       sign = "-";
       data.bonus -= Math.round(percent);
       data.money += Number(req.body.bonus) - Math.round(percent);
       bonusTrans = Math.round(percent);
-      message = {
-        fullPay: req.body.bonus,
-        bonus: Math.round(percent),
-        pay: Number(req.body.bonus) - Math.round(percent),
-        action: "withdraw",
-      };
+      // refractoring message
+      let pay = Number(req.body.bonus) - Math.round(percent);
+      message = messageClient(
+        Math.round(percent),
+        "withdraw",
+        pay,
+        req.body,
+        bonus
+      );
+      // console.log(message);
+      // {
+      //   fullPay: req.body.bonus,
+      //   bonus: Math.round(percent),
+      //   pay: Number(req.body.bonus) - Math.round(percent),
+      //   action: "withdraw",
+      // };
+      // refractoring message
     }
   }
+  let transactionData = {
+    date: date(),
+    moneySpend: `+${moneySpend}`,
+    money: `${data.money}`,
+    bonus: `${sign}${bonusTrans}`,
+    bonusTotal: data.bonus,
+  };
 
   dataBaseM.findOneAndUpdate({ phone: idPhone }, data, function (err, update) {
     if (err) {
@@ -113,24 +147,15 @@ app.post("/client", function (req, res) {
       console.log(`Clent ${data.name} NOT updated`);
       res.redirect("/client");
     } else {
-      Transactions.create(
-        {
-          date: date(),
-          moneySpend: `+${moneySpend}`,
-          money: `+${data.money}`,
-          bonus: `${sign}${bonusTrans}`,
-          bonusTotal: data.bonus,
-        },
-        function (err, transaction) {
-          if (err) {
-            console.log(err);
-          } else {
-            update.transactions.push(transaction);
-            update.save();
-            console.log("Created new transaction");
-          }
+      Transactions.create(transactionData, function (err, transaction) {
+        if (err) {
+          console.log(err);
+        } else {
+          update.transactions.push(transaction);
+          update.save();
+          console.log("Created new transaction");
         }
-      );
+      });
       //redirect somewhere(show page)
       console.log(`Clent ${data.name} updated`);
       res.redirect("/client");
@@ -178,29 +203,29 @@ app.post("/create", function (req, res) {
         phone: idPhone,
         action: "added",
       };
+
+      let transactionData = {
+        date: date(),
+        moneySpend: `+${clientCreated.money}`,
+        money: `${clientCreated.money}`,
+        bonus: `+${clientCreated.bonus}`,
+        bonusTotal: `+${clientCreated.bonus}`,
+      };
+
       dataBaseM.create(clientCreated, function (err, client) {
         if (err) {
           console.log(err);
           res.redirect("/create");
         } else {
-          Transactions.create(
-            {
-              date: date(),
-              moneySpend: `+${clientCreated.money}`,
-              money: `+${clientCreated.money}`,
-              bonus: `+${clientCreated.bonus}`,
-              bonusTotal: `+${clientCreated.bonus}`,
-            },
-            function (err, transaction) {
-              if (err) {
-                console.log(err);
-              } else {
-                client.transactions.push(transaction);
-                client.save();
-                console.log("Created new transaction");
-              }
+          Transactions.create(transactionData, function (err, transaction) {
+            if (err) {
+              console.log(err);
+            } else {
+              client.transactions.push(transaction);
+              client.save();
+              console.log("Created new transaction");
             }
-          );
+          });
           console.log("added a client");
           res.redirect("/create");
         }
@@ -222,3 +247,28 @@ app.get("/list", function (req, res) {
 app.listen(app.get("port"), function () {
   console.log("Express started on http://localhost:" + app.get("port"));
 });
+
+// functions to refractor
+// client POST functions
+const bonusFunc = (bonus, bonusIndex) => {
+  return Number(bonus) / bonusIndex;
+};
+
+const percentFunc = (bonus, percent) => {
+  return (Number(bonus) * Number(percent)) / 100;
+};
+
+const bonusPercentFunc = (bonus, percent) => {
+  return bonus - Math.round(percent);
+};
+// client POST functions
+
+// message Obj creator
+const messageClient = (
+  bonus = null,
+  action = null,
+  pay = null,
+  fullPay = null
+) => {
+  return { bonus: bonus, action: action, pay: pay, fullPay: fullPay };
+};
