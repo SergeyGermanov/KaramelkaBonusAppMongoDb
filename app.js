@@ -26,10 +26,11 @@ app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: true }));
 seedDb();
 
-var phNumber;
-var idPhone;
-var data;
-var message;
+let phNumber;
+let idPhone;
+let data;
+let message;
+let arrTrans = [];
 
 app.get("/", function (req, res) {
   res.render("index");
@@ -59,15 +60,13 @@ app.get("/client", function (req, res) {
 });
 
 app.post("/client", function (req, res) {
-  // console.log(data);
   data.bonusIndex = Number(req.body.bonusIndex);
   data.percent = Number(req.body.percent);
 
-  // var bonus = Number(req.body.bonus) / data.bonusIndex;
   var bonus = bonusFunc(req.body.bonus, data.bonusIndex);
-  // var percent = (Number(req.body.bonus) * Number(req.body.percent)) / 100;
+
   var percent = percentFunc(req.body.bonus, req.body.percent);
-  // var bonusPercent = data.bonus - Math.round(percent);
+
   var bonusPercent = bonusPercentFunc(data.bonus, percent);
 
   var sign = "+";
@@ -78,40 +77,24 @@ app.post("/client", function (req, res) {
     data.bonus += Math.round(bonus);
     data.money += Number(req.body.bonus);
     bonusTrans = Math.round(bonus);
-    // refractoring message
 
     message = messageClient(Math.round(bonus), "deposit");
-    // console.log(message);
-    // {
-    //   bonus: Math.round(bonus),
-    //   action: "deposit",
-    // };
-
-    // refractoring message
   } else {
     if (bonusPercent < 0) {
       sign = "-";
       data.money += Math.abs(bonusPercent);
       bonusTrans = data.bonus;
 
-      // refractoring message
       let pay = req.body.bonus - data.bonus;
       message = messageClient(data.bonus, "withdraw", pay, req.body.bonus);
-      // console.log(message);
-      // {
-      //   fullPay: req.body.bonus,
-      //   bonus: data.bonus,
-      //   pay: req.body.bonus - data.bonus,
-      //   action: "withdraw",
-      // };
-      // refractoring message
+
       data.bonus = 0;
     } else {
       sign = "-";
       data.bonus -= Math.round(percent);
       data.money += Number(req.body.bonus) - Math.round(percent);
       bonusTrans = Math.round(percent);
-      // refractoring message
+
       let pay = Number(req.body.bonus) - Math.round(percent);
       message = messageClient(
         Math.round(percent),
@@ -120,14 +103,6 @@ app.post("/client", function (req, res) {
         req.body,
         bonus
       );
-      // console.log(message);
-      // {
-      //   fullPay: req.body.bonus,
-      //   bonus: Math.round(percent),
-      //   pay: Number(req.body.bonus) - Math.round(percent),
-      //   action: "withdraw",
-      // };
-      // refractoring message
     }
   }
   let transactionData = {
@@ -151,8 +126,14 @@ app.post("/client", function (req, res) {
         if (err) {
           console.log(err);
         } else {
-          update.transactions.push(transaction);
+          // create array and then push all elements of it to mongoDb
+          arrTrans.push(transaction);
+
+          arrTrans.forEach((el) => {
+            update.transactions.push(el);
+          });
           update.save();
+
           console.log("Created new transaction");
         }
       });
