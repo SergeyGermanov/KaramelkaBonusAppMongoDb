@@ -5,6 +5,30 @@
     $(".ui.accordion").accordion();
   });
 </script>
+<!-- saving into an HTML file -->
+<script>
+  function download(id) {
+
+    const head = document.querySelector('head').innerHTML;
+    let newNode = document.querySelector(`#${id}`).cloneNode(true);
+    newNode.querySelector('.wrapper').remove();
+    const name = newNode.querySelector('div .title').textContent.trim();
+
+    const filename = `${name}.html`;
+    const blob = new Blob([head + newNode.innerHTML], { type: "html" });
+    if (window.navigator.msSaveOrOpenBlob) {
+      window.navigator.msSaveBlob(blob, filename);
+    } else {
+      let elem = window.document.createElement("a");
+      elem.href = window.URL.createObjectURL(blob);
+      elem.download = filename;
+      document.body.appendChild(elem);
+      elem.click();
+      document.body.removeChild(elem);
+    }
+
+  }
+</script>
 
 <div class="ui container">
   <div class="ui warning form segment">
@@ -14,68 +38,77 @@
     </div>
 
     <div class="ui styled fluid accordion">
-      <%list.forEach((list) => {%>
+      <%list.forEach((list, index) => {%>
+      <div id="client<%=index%>">
+        <div class="title">
+          <i class="dropdown icon"></i>
+          <%= list.name%>
+        </div>
+        <div class="content">
+          <p class="transition hidden">
+            <strong>Номер телефона:</strong> +<%= list.phone%>
+          </p>
+          <p class="transition hidden">
+            <strong>Количество бонусов:</strong> <%= list.bonus%> баллов
+          </p>
+          <p class="transition hidden">
+            <strong>Бонус равен:</strong> 1 Бонус = <%= list.bonusIndex%> рублям
+          </p>
+          <p class="transition hidden">
+            <strong>Процент списания:</strong> <%= list.percent%>%
+          </p>
 
-      <div class="title">
-        <i class="dropdown icon"></i>
-        <%= list.name%>
-      </div>
-      <div class="content">
-        <p class="transition hidden">
-          <strong>Номер телефона:</strong> +<%= list.phone%>
-        </p>
-        <p class="transition hidden">
-          <strong>Количество бонусов:</strong> <%= list.bonus%> баллов
-        </p>
-        <p class="transition hidden">
-          <strong>Бонус равен:</strong> 1 Бонус = <%= list.bonusIndex%> рублям
-        </p>
-        <p class="transition hidden">
-          <strong>Процент списания:</strong> <%= list.percent%>%
-        </p>
-
-        <p class="transition hidden">
-          <strong>Потрачено в салоне:</strong> <%= list.money%> рублей
-        </p>
-        <!-- nested accordion -->
-        <div
-          class="accordion transition visible"
-          style="display: block !important;"
-        >
-          <div class="title">
-            <i class="dropdown icon"></i>
-            Транзакции за все время
+          <p class="transition hidden">
+            <strong>Потрачено в салоне:</strong> <%= list.money%> рублей
+          </p>
+          <div class="wrapper">
+            <button class="ui orange basic button" onclick="download('client<%=index%>')"> Сохранить Транзакции в
+              фаил
+            </button>
           </div>
-          <div class="content">
-            <div class="ui relaxed divided list">
-              <%list.transactions.forEach((transactions) => {%>
-              <div class="item">
-                <i class="credit card outline icon"></i>
-                <div class="content">
-                  <a class="header"><%= transactions.date%></a>
-                  <div class="description">
-                    Бонусы списаны/начислены: <%= transactions.bonus%>
-                  </div>
-                  <div class="description">
-                    Потрачено денег: <%= transactions.moneySpend%>
-                  </div>
-                  <div class="description">
-                    Денег в остатке: <%= transactions.money%>
-                  </div>
-                  <div class="description">
-                    Бонусы в остатке: <%= transactions.bonusTotal%>
+
+
+          <!-- nested accordion -->
+          <div class="accordion transition visible" style="display: block !important;">
+            <div class="title">
+              <i class="dropdown icon"></i>
+
+              Показать Транзакции
+            </div>
+            <div class="content">
+              <div class="ui relaxed divided list">
+                <%list.transactions.forEach((transactions) => {%>
+
+                <div class="item">
+                  <i class="credit card outline icon"></i>
+                  <div class="content">
+                    <a class="header"><%= transactions.date%></a>
+                    <div class="description">
+                      Бонусы списаны/начислены: <%= transactions.bonus%>
+                    </div>
+                    <div class="description">
+                      Потрачено денег: <%= transactions.moneySpend%>
+                    </div>
+                    <div class="description">
+                      Денег в остатке: <%= transactions.money%>
+                    </div>
+                    <div class="description">
+                      Бонусы в остатке: <%= transactions.bonusTotal%>
+                    </div>
                   </div>
                 </div>
+
+                <%})%>
               </div>
-              <%})%>
             </div>
           </div>
         </div>
       </div>
-
       <%})%>
     </div>
   </div>
+
+
 
   <%- include('partials/footer')%>
 </div>
